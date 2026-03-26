@@ -7,7 +7,9 @@ import rehypeHighlight from 'rehype-highlight'
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
 import { fetchLesson, completeLesson, runCode } from '../api/lessons'
+import { fetchCourse } from '../api/courses'
 import { useAuthStore } from '../store/authStore'
+import type { Module as CourseModule } from '../types'
 import type {
   Lesson,
   QuizQuestion,
@@ -114,10 +116,11 @@ interface ResultOverlayProps {
   result: LessonCompleteResponse
   lessonType: string
   courseId: string
+  nextLessonId?: number | null
   onRetry?: () => void
 }
 
-function ResultOverlay({ result, lessonType, courseId, onRetry }: ResultOverlayProps) {
+function ResultOverlay({ result, lessonType, courseId, nextLessonId, onRetry }: ResultOverlayProps) {
   const navigate = useNavigate()
   const isQuiz = lessonType === 'QUIZ'
   const passed = !isQuiz || result.score >= 50
@@ -226,15 +229,28 @@ function ResultOverlay({ result, lessonType, courseId, onRetry }: ResultOverlayP
               Попробовать снова
             </button>
           )}
+          {passed && nextLessonId && (
+            <button
+              onClick={() => navigate(`/courses/${courseId}/lessons/${nextLessonId}`)}
+              className="h-12 w-full rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-bold text-base flex items-center justify-center gap-2 transition-colors"
+            >
+              Следующий урок →
+            </button>
+          )}
+          {passed && !nextLessonId && (
+            <div className="text-center py-1">
+              <p className="text-lg font-extrabold text-gray-900">Курс завершён! 🎉</p>
+            </div>
+          )}
           <button
             onClick={() => navigate(`/courses/${courseId}`)}
             className={`h-12 w-full rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-colors ${
               passed
-                ? 'bg-primary-500 hover:bg-primary-600 text-white'
+                ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
             }`}
           >
-            Вернуться к курсу
+            К курсу
           </button>
         </div>
       </motion.div>
@@ -560,16 +576,40 @@ export default function LessonPage() {
   const [error, setError] = useState<string | null>(null)
   const [isCompleting, setIsCompleting] = useState(false)
   const [result, setResult] = useState<LessonCompleteResponse | null>(null)
+  const [nextLessonId, setNextLessonId] = useState<number | null>(null)
 
   useEffect(() => {
-    if (!lessonId) return
+    if (!lessonId || !courseId) return
     setIsLoading(true)
     setError(null)
-    fetchLesson(Number(lessonId))
-      .then(setLesson)
+    Promise.all([
+      fetchLesson(Number(lessonId)),
+      fetchCourse(Number(courseId)).catch(() => null),
+    ])
+      .then(([lessonData, courseData]) => {
+        setLesson(lessonData)
+        if (courseData?.modules) {
+          // Build a flat sorted list of all lessons across modules
+          const allLessons = (courseData.modules as CourseModule[])
+            .slice()
+            .sort((a, b) => a.orderIndex - b.orderIndex)
+            .flatMap((m) =>
+              (m.lessons ?? [])
+                .slice()
+                .sort((a, b) => a.orderIndex - b.orderIndex)
+                .map((l) => ({ ...l, _moduleOrderIndex: m.orderIndex })),
+            )
+          const currentIdx = allLessons.findIndex((l) => l.id === Number(lessonId))
+          if (currentIdx !== -1 && currentIdx < allLessons.length - 1) {
+            setNextLessonId(allLessons[currentIdx + 1].id)
+          } else {
+            setNextLessonId(null)
+          }
+        }
+      })
       .catch(() => setError('Не удалось загрузить урок. Попробуй позже.'))
       .finally(() => setIsLoading(false))
-  }, [lessonId])
+  }, [lessonId, courseId])
 
   const handleComplete = useCallback(
     async (extra?: { quizAnswers?: { questionId: number; selectedOptionIds: number[] }[]; code?: string }) => {
@@ -684,6 +724,7 @@ export default function LessonPage() {
             result={result}
             lessonType={lesson.lessonType}
             courseId={courseId ?? ''}
+            nextLessonId={nextLessonId}
             onRetry={result.score < 50 ? handleRetry : undefined}
           />
         )}

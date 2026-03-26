@@ -15,6 +15,18 @@ const DIFFICULTY_GRADIENT: Record<Difficulty, string> = {
   ADVANCED: 'from-red-400 to-rose-500',
 }
 
+const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  BEGINNER: 'Начинающий',
+  INTERMEDIATE: 'Средний',
+  ADVANCED: 'Продвинутый',
+}
+
+const DIFFICULTY_COLORS: Record<Difficulty, string> = {
+  BEGINNER: 'bg-green-100 text-green-700',
+  INTERMEDIATE: 'bg-yellow-100 text-yellow-700',
+  ADVANCED: 'bg-red-100 text-red-700',
+}
+
 // ─── Section header ───────────────────────────────────────────────────────────
 
 interface SectionHeaderProps {
@@ -94,26 +106,56 @@ function CatalogCourseCard({ course }: CatalogCourseCardProps) {
   const navigate = useNavigate()
   const difficulty = course.difficulty as Difficulty
   const gradient = DIFFICULTY_GRADIENT[difficulty] ?? 'from-primary-400 to-primary-600'
+  const difficultyLabel = DIFFICULTY_LABELS[difficulty]
+  const difficultyColor = DIFFICULTY_COLORS[difficulty] ?? 'bg-gray-100 text-gray-600'
 
   return (
     <button
       onClick={() => navigate(`/courses/${course.id}`)}
-      className="flex-shrink-0 w-52 bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
+      className="w-full text-left bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex sm:flex-col"
     >
+      {/* Image / gradient — horizontal on mobile (left side), full-width on desktop (top) */}
       <div
-        className={`h-28 bg-gradient-to-br ${gradient} flex items-center justify-center overflow-hidden`}
+        className={`flex-shrink-0 w-24 sm:w-full sm:h-32 bg-gradient-to-br ${gradient} flex items-center justify-center overflow-hidden`}
       >
         {course.imageUrl ? (
           <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover" />
         ) : (
-          <span className="text-4xl select-none">💻</span>
+          <span className="text-3xl sm:text-4xl select-none">💻</span>
         )}
       </div>
-      <div className="p-3">
+
+      {/* Info */}
+      <div className="flex-1 p-3 flex flex-col gap-1.5 min-w-0">
+        {/* Badges row */}
+        <div className="flex flex-wrap gap-1.5">
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${difficultyColor}`}>
+            {difficultyLabel}
+          </span>
+          {course.ageFrom != null && course.ageTo != null && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
+              {course.ageFrom}–{course.ageTo} лет
+            </span>
+          )}
+        </div>
+
+        {/* Title */}
         <p className="font-bold text-gray-900 text-sm leading-snug line-clamp-2">{course.title}</p>
-        {course.totalBytesReward > 0 && (
-          <p className="text-xs text-primary-500 font-semibold mt-1.5">💎 {course.totalBytesReward} байт</p>
+
+        {/* Description */}
+        {course.description && (
+          <p className="text-xs text-gray-400 line-clamp-1 leading-relaxed">{course.description}</p>
         )}
+
+        {/* Footer: lesson count + reward */}
+        <div className="flex items-center gap-2 mt-auto pt-0.5">
+          {course.lessonsCount != null && course.lessonsCount > 0 && (
+            <span className="text-xs text-gray-500">📝 {course.lessonsCount} ур.</span>
+          )}
+          {course.totalBytesReward > 0 && (
+            <span className="text-xs text-primary-500 font-semibold">💎 {course.totalBytesReward}</span>
+          )}
+        </div>
       </div>
     </button>
   )
@@ -277,8 +319,8 @@ export default function MainPage() {
             linkLabel="Все"
             onLink={() => navigate('/courses')}
           />
-          {/* Horizontal scroll on mobile, grid on md+ */}
-          <div className="flex gap-3 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-2 md:overflow-visible md:mx-0 md:px-0">
+          {/* Vertical stack on mobile, 3-column grid on lg+ */}
+          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3">
             {recommended.map((course) => (
               <CatalogCourseCard key={course.id} course={course} />
             ))}

@@ -29,6 +29,8 @@ export interface Course {
   modules?: Module[]
   modulesCount?: number
   lessonsCount?: number
+  enrolled?: boolean
+  progressPercent?: number
 }
 
 export interface Module {

@@ -210,9 +210,12 @@ export default function CoursePage() {
     fetchCourse(Number(courseId))
       .then((data) => {
         setCourse(data)
-        // Check enrollment from data if backend returns it
-        // For now, we derive from lessons progress
-        if (data.modules) {
+        // Prefer backend-provided enrollment fields
+        if (data.enrolled !== undefined) {
+          setEnrolled(data.enrolled)
+          setProgressPercent(data.progressPercent ?? 0)
+        } else if (data.modules) {
+          // Fallback: derive from lessons progress
           const allLessons = data.modules.flatMap((m: Module) => m.lessons ?? [])
           const completedCount = allLessons.filter((l: Lesson) =>
             isCompleted(l.userProgress?.status),

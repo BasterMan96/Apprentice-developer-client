@@ -51,6 +51,7 @@ export interface Lesson {
   orderIndex: number
   xpReward: number
   bytesReward: number
+  completed?: boolean
   quizQuestions?: QuizQuestion[]
   codeTasks?: CodeTask[]
   userProgress?: UserProgress

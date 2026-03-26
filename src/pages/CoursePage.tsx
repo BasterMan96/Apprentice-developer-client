@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronDown, ChevronUp, ArrowLeft, BookOpen, Puzzle, Code2, Rocket, CheckCircle2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { fetchCourse, enrollCourse } from '../api/courses'
-import type { Course, Module, Lesson, Difficulty, LessonType, ProgressStatus } from '../types'
+import type { Course, Module, Lesson, Difficulty, LessonType } from '../types'
 
 // Difficulty config
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
@@ -40,8 +40,8 @@ const LESSON_TYPE_LABEL: Record<LessonType, string> = {
 }
 
 // Helpers
-function isCompleted(status?: ProgressStatus) {
-  return status === 'COMPLETED'
+function isLessonDone(lesson: Lesson) {
+  return lesson.completed === true || lesson.userProgress?.status === 'COMPLETED'
 }
 
 // Lesson row
@@ -54,7 +54,7 @@ interface LessonRowProps {
 
 function LessonRow({ lesson, courseId }: LessonRowProps) {
   const navigate = useNavigate()
-  const completed = isCompleted(lesson.userProgress?.status)
+  const completed = isLessonDone(lesson)
 
   return (
     <button
@@ -100,7 +100,7 @@ interface ModuleItemProps {
 function ModuleItem({ module, courseId, index, defaultOpen = false }: ModuleItemProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen)
   const lessons = module.lessons ?? []
-  const completedCount = lessons.filter((l) => isCompleted(l.userProgress?.status)).length
+  const completedCount = lessons.filter((l) => isLessonDone(l)).length
 
   return (
     <div className="border border-gray-200 rounded-2xl overflow-hidden">
@@ -218,7 +218,7 @@ export default function CoursePage() {
           // Fallback: derive from lessons progress
           const allLessons = data.modules.flatMap((m: Module) => m.lessons ?? [])
           const completedCount = allLessons.filter((l: Lesson) =>
-            isCompleted(l.userProgress?.status),
+            isLessonDone(l),
           ).length
           if (allLessons.length > 0) {
             setProgressPercent(Math.round((completedCount / allLessons.length) * 100))
@@ -360,7 +360,7 @@ export default function CoursePage() {
               const firstLesson = modules
                 .flatMap((m: Module) => m.lessons ?? [])
                 .sort((a: Lesson, b: Lesson) => a.orderIndex - b.orderIndex)
-                .find((l: Lesson) => !isCompleted(l.userProgress?.status))
+                .find((l: Lesson) => !isLessonDone(l))
               if (firstLesson) {
                 navigate(`/courses/${courseId}/lessons/${firstLesson.id}`)
               }

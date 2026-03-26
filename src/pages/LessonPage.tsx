@@ -582,6 +582,8 @@ export default function LessonPage() {
     if (!lessonId || !courseId) return
     setIsLoading(true)
     setError(null)
+    setResult(null)
+    setLesson(null)
     Promise.all([
       fetchLesson(Number(lessonId)),
       fetchCourse(Number(courseId)).catch(() => null),

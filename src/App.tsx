@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
@@ -12,6 +12,11 @@ import PortfolioPage from './pages/PortfolioPage'
 import CertificatesPage from './pages/CertificatesPage'
 import ParentDashboardPage from './pages/ParentDashboardPage'
 import { useAuthStore } from './store/authStore'
+
+function LessonPageWrapper() {
+  const { lessonId } = useParams()
+  return <LessonPage key={lessonId} />
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -40,7 +45,7 @@ export default function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:courseId" element={<CoursePage />} />
-          <Route path="/courses/:courseId/lessons/:lessonId" element={<LessonPage />} />
+          <Route path="/courses/:courseId/lessons/:lessonId" element={<LessonPageWrapper />} />
           <Route path="/learning" element={<MyLearningPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/portfolio" element={<PortfolioPage />} />

@@ -19,8 +19,9 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 || error.response?.status === 403) {
       localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem('bytik-auth')
       window.location.href = '/login'
     }
     return Promise.reject(error)

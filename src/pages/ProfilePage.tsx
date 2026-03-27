@@ -8,12 +8,14 @@ import type { UserStats, Achievement } from '../types'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+// Backend formula: level = floor(sqrt(xp / 100)) + 1
+// So xp threshold for level N: (N-1)^2 * 100
 function xpForLevel(level: number) {
-  return level * 200
+  return (level - 1) * (level - 1) * 100
 }
 
 function nextLevelXp(level: number) {
-  return (level + 1) * 200
+  return level * level * 100
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────

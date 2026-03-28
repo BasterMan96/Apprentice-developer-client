@@ -245,7 +245,7 @@ export default function MainPage() {
     .filter((c) => !enrolledIds.has(c.id))
     .slice(0, 4)
 
-  const firstName = user?.fullName.split(' ')[0] ?? 'Ученик'
+  const displayName = user?.fullName ?? 'Ученик'
   const level = user?.level ?? 1
   const xp = user?.xp ?? 0
   const bytes = user?.bytesBalance ?? 0
@@ -260,7 +260,7 @@ export default function MainPage() {
       {/* Welcome */}
       <div>
         <h1 className="text-2xl font-extrabold text-gray-900 leading-tight">
-          Привет, {firstName}! 👋
+          Привет, {displayName}! 👋
         </h1>
         <p className="text-sm text-gray-400 mt-1">Продолжим учиться?</p>
       </div>

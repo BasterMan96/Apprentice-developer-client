@@ -10,4 +10,20 @@
   body {
     @apply bg-gray-50 text-gray-900;
   }
+
+  .prose pre {
+    @apply bg-gray-900 text-gray-100 rounded-xl overflow-x-auto;
+  }
+
+  .prose pre code {
+    @apply text-gray-100;
+  }
+
+  .prose code {
+    @apply bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
 }

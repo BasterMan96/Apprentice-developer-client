@@ -67,7 +67,7 @@ function MyCourseCard({ enrollment }: MyCourseCardProps) {
 
   return (
     <button
-      onClick={() => navigate(`/courses/${enrollment.courseId}`)}
+      onClick={() => navigate(`/courses/${enrollment.course?.id}`)}
       className="w-full text-left bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex gap-3 items-center p-3"
     >
       <div

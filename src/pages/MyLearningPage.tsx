@@ -91,7 +91,7 @@ function EnrollmentCard({ enrollment }: EnrollmentCardProps) {
           </div>
         ) : (
           <button
-            onClick={() => navigate(`/courses/${enrollment.courseId}`)}
+            onClick={() => navigate(`/courses/${enrollment.course?.id}`)}
             className="h-11 w-full rounded-xl bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors"
           >
             Продолжить

@@ -8,7 +8,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 bg-white border-b border-gray-200 shadow-sm">
       <Link to="/" className="flex items-center gap-2">
-        <span className="text-xl font-bold text-primary-500">Bytik</span>
+        <span className="text-xl font-bold text-primary-500">Байтик</span>
       </Link>
 
       <div className="flex items-center gap-3">

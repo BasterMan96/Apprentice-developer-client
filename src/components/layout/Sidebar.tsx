@@ -32,7 +32,7 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col w-60 min-h-screen bg-white border-r border-gray-200 pt-4 pb-8">
       <div className="px-6 mb-6">
-        <span className="text-2xl font-bold text-primary-500">Bytik</span>
+        <span className="text-2xl font-bold text-primary-500">Байтик</span>
       </div>
 
       <nav className="flex-1 px-3 space-y-1">

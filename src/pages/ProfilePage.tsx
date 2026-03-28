@@ -13,29 +13,34 @@ interface ShopItem {
   name: string
   price: number
   emoji: string
-  description: string
+  category: 'merch' | 'opportunity'
 }
 
 const SHOP_ITEMS: ShopItem[] = [
-  { id: 1, name: 'Футболка Байтик', price: 500, emoji: '👕', description: 'Белая футболка с логотипом' },
-  { id: 2, name: 'Худи Байтик', price: 1000, emoji: '🧥', description: 'Тёплое худи для кодеров' },
-  { id: 3, name: 'Стикерпак', price: 100, emoji: '🎨', description: 'Набор из 10 стикеров' },
-  { id: 4, name: 'Кружка Python', price: 300, emoji: '☕', description: 'Кружка с змейкой' },
-  { id: 5, name: 'Блокнот', price: 200, emoji: '📓', description: 'Для заметок и алгоритмов' },
-  { id: 6, name: 'Рюкзак', price: 2000, emoji: '🎒', description: 'Рюкзак программиста' },
+  { id: 1, name: 'Фирменная толстовка', price: 1500, emoji: '🧥', category: 'merch' },
+  { id: 2, name: 'Фирменная футболка', price: 1500, emoji: '👕', category: 'merch' },
+  { id: 3, name: 'Стажировка в Минцифре', price: 10000, emoji: '🏛️', category: 'opportunity' },
+  { id: 4, name: 'Амбассадорство в Минцифре', price: 7000, emoji: '🎖️', category: 'opportunity' },
+  { id: 5, name: 'Летний лагерь от Минцифры', price: 10000, emoji: '🏕️', category: 'opportunity' },
 ]
 
 function ShopCard({ item, userBytes }: { item: ShopItem; userBytes: number }) {
   const canAfford = userBytes >= item.price
   const [bought, setBought] = useState(false)
+  const isOpportunity = item.category === 'opportunity'
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-3 flex flex-col gap-2 shadow-sm">
-      <div className="text-4xl text-center py-2">{item.emoji}</div>
-      <h3 className="font-bold text-sm text-gray-900 text-center leading-tight">{item.name}</h3>
-      <p className="text-xs text-gray-400 text-center">{item.description}</p>
+    <div className={`border rounded-2xl p-4 flex flex-col gap-2 shadow-sm transition-all hover:shadow-md ${
+      isOpportunity
+        ? 'bg-gradient-to-br from-primary-50 to-amber-50 border-primary-200'
+        : 'bg-white border-gray-200'
+    }`}>
+      <div className="text-4xl text-center py-3">{item.emoji}</div>
+      <h3 className={`font-bold text-sm text-center leading-tight ${
+        isOpportunity ? 'text-primary-700' : 'text-gray-900'
+      }`}>{item.name}</h3>
       <div className="flex items-center justify-center gap-1 text-sm font-bold text-primary-600">
-        💎 {item.price} байтов
+        💎 {item.price.toLocaleString()} байтов
       </div>
       <button
         onClick={() => { if (canAfford && !bought) setBought(true) }}
@@ -302,14 +307,14 @@ export default function ProfilePage() {
           <span className="text-xl">🛒</span>
           <h2 className="text-lg font-extrabold text-gray-900">Обменник Байтов</h2>
         </div>
-        <p className="text-sm text-gray-500">Обменяй заработанные байты на крутой мерч!</p>
-        <div className="grid grid-cols-2 gap-3">
+        <p className="text-sm text-gray-500">Обменяй заработанные байты на мерч и возможности!</p>
+
+        {/* Каталог товаров */}
+        <h3 className="text-base font-bold text-gray-800 mt-2">Каталог товаров</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {SHOP_ITEMS.map((item) => (
             <ShopCard key={item.id} item={item} userBytes={stats?.bytesBalance ?? displayUser.bytesBalance} />
           ))}
-        </div>
-        <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 text-center">
-          <p className="text-sm font-semibold text-primary-700">🎯 Накопи 10 000 байтов — получи стажировку в IT-компании!</p>
         </div>
       </div>
 

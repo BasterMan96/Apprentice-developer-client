@@ -12,16 +12,17 @@ interface ShopItem {
   id: number
   name: string
   price: number
-  emoji: string
+  image?: string
+  emoji?: string
   category: 'merch' | 'opportunity'
 }
 
 const SHOP_ITEMS: ShopItem[] = [
-  { id: 1, name: 'Фирменная толстовка', price: 1500, emoji: '🧥', category: 'merch' },
-  { id: 2, name: 'Фирменная футболка', price: 1500, emoji: '👕', category: 'merch' },
-  { id: 3, name: 'Стажировка в Минцифре', price: 10000, emoji: '🏛️', category: 'opportunity' },
-  { id: 4, name: 'Амбассадорство в Минцифре', price: 7000, emoji: '🎖️', category: 'opportunity' },
-  { id: 5, name: 'Летний лагерь от Минцифры', price: 10000, emoji: '🏕️', category: 'opportunity' },
+  { id: 1, name: 'Фирменная толстовка', price: 1500, image: '/shop/hoodie.png', category: 'merch' },
+  { id: 2, name: 'Фирменная футболка', price: 1500, image: '/shop/tshirt.png', category: 'merch' },
+  { id: 3, name: 'Стажировка в Минцифре', price: 10000, image: '/shop/internship.png', category: 'opportunity' },
+  { id: 4, name: 'Амбассадорство в Минцифре', price: 7000, image: '/shop/internship.png', category: 'opportunity' },
+  { id: 5, name: 'Летний лагерь от Минцифры', price: 10000, image: '/shop/internship.png', category: 'opportunity' },
 ]
 
 function ShopCard({ item, userBytes, onBuy }: { item: ShopItem; userBytes: number; onBuy: (price: number) => void }) {
@@ -42,7 +43,13 @@ function ShopCard({ item, userBytes, onBuy }: { item: ShopItem; userBytes: numbe
         ? 'bg-gradient-to-br from-primary-50 to-amber-50 border-primary-200'
         : 'bg-white border-gray-200'
     }`}>
-      <div className="text-4xl text-center py-3">{item.emoji}</div>
+      <div className="flex items-center justify-center py-3 h-28">
+        {item.image ? (
+          <img src={item.image} alt={item.name} className="h-full w-auto object-contain rounded-lg" />
+        ) : (
+          <span className="text-4xl">{item.emoji}</span>
+        )}
+      </div>
       <h3 className={`font-bold text-sm text-center leading-tight ${
         isOpportunity ? 'text-primary-700' : 'text-gray-900'
       }`}>{item.name}</h3>

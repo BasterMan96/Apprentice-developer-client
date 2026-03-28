@@ -119,9 +119,10 @@ interface ResultOverlayProps {
   courseId: string
   nextLessonId?: number | null
   onRetry?: () => void
+  onClose: () => void
 }
 
-function ResultOverlay({ result, lessonType, courseId, nextLessonId, onRetry }: ResultOverlayProps) {
+function ResultOverlay({ result, lessonType, courseId, nextLessonId, onRetry, onClose }: ResultOverlayProps) {
   const navigate = useNavigate()
   const isQuiz = lessonType === 'QUIZ'
   const passed = !isQuiz || result.score >= 50
@@ -132,14 +133,25 @@ function ResultOverlay({ result, lessonType, courseId, nextLessonId, onRetry }: 
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-4"
+      onClick={onClose}
     >
       <motion.div
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 80, opacity: 0 }}
         transition={{ type: 'spring', damping: 20, stiffness: 260 }}
-        className="bg-white rounded-2xl w-full max-w-sm p-6 flex flex-col gap-5 shadow-2xl"
+        className="bg-white rounded-2xl w-full max-w-sm p-6 flex flex-col gap-5 shadow-2xl relative"
+        onClick={(e) => e.stopPropagation()}
       >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-colors"
+          aria-label="Закрыть"
+        >
+          ✕
+        </button>
+
         {/* Icon */}
         <div className="flex justify-center">
           <motion.div
@@ -737,6 +749,7 @@ export default function LessonPage() {
             courseId={courseId ?? ''}
             nextLessonId={nextLessonId}
             onRetry={result.score < 50 ? handleRetry : undefined}
+            onClose={() => setResult(null)}
           />
         )}
       </AnimatePresence>

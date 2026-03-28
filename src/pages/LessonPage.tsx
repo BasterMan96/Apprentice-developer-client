@@ -9,6 +9,7 @@ import { python } from '@codemirror/lang-python'
 import { fetchLesson, completeLesson, runCode } from '../api/lessons'
 import { fetchCourse } from '../api/courses'
 import { useAuthStore } from '../store/authStore'
+import CommentsSection from '../components/lesson/CommentsSection'
 import type { Module as CourseModule } from '../types'
 import type {
   Lesson,
@@ -704,6 +705,14 @@ export default function LessonPage() {
           isCompleting={isCompleting}
         />
       )}
+
+      <CommentsSection
+        lessonId={lesson.id}
+        isCompleted={
+          lesson.userProgress?.status === 'COMPLETED' ||
+          (result !== null && (lesson.lessonType !== 'QUIZ' || result.score >= 50))
+        }
+      />
 
       {/* Error toast */}
       <AnimatePresence>

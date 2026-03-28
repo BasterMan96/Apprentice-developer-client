@@ -179,3 +179,17 @@ export interface UserStats {
 export interface ActivityDay {
   [date: string]: { lessonsCompleted: number }
 }
+
+export interface LessonComment {
+  id: number
+  authorName: string
+  authorLogin: string
+  content: string
+  createdAt: string
+  isOwn: boolean
+}
+
+export interface CommentsResponse {
+  comments: LessonComment[]
+  total: number
+}

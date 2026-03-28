@@ -589,6 +589,7 @@ export default function LessonPage() {
   const [error, setError] = useState<string | null>(null)
   const [isCompleting, setIsCompleting] = useState(false)
   const [result, setResult] = useState<LessonCompleteResponse | null>(null)
+  const [lessonDone, setLessonDone] = useState(false)
   const [nextLessonId, setNextLessonId] = useState<number | null>(null)
 
   useEffect(() => {
@@ -637,6 +638,7 @@ export default function LessonPage() {
           code: extra?.code,
         })
         setResult(res)
+        setLessonDone(true)
         if (user) {
           updateUser({
             xp: user.xp + res.xpEarned,
@@ -721,8 +723,7 @@ export default function LessonPage() {
       <CommentsSection
         lessonId={lesson.id}
         isCompleted={
-          lesson.userProgress?.status === 'COMPLETED' ||
-          (result !== null && (lesson.lessonType !== 'QUIZ' || result.score >= 50))
+          lesson.userProgress?.status === 'COMPLETED' || lessonDone
         }
       />
 

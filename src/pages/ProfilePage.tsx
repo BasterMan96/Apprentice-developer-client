@@ -76,12 +76,14 @@ function ShopCard({ item, userBytes, onBuy }: { item: ShopItem; userBytes: numbe
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 // Backend formula: level = floor(sqrt(xp / 100)) + 1
-// So xp threshold for level N: (N-1)^2 * 100
-function xpForLevel(level: number) {
+// XP needed to REACH level N: (N-1)^2 * 100
+// Level 1 starts at 0 XP, level 2 at 100 XP, level 3 at 400 XP
+function xpThreshold(level: number) {
+  if (level <= 1) return 0
   return (level - 1) * (level - 1) * 100
 }
 
-function nextLevelXp(level: number) {
+function nextLevelThreshold(level: number) {
   return level * level * 100
 }
 
@@ -202,9 +204,11 @@ export default function ProfilePage() {
 
   const currentLevel = stats?.level ?? displayUser.level
   const totalXp = stats?.totalXp ?? displayUser.xp
-  const xpIntoLevel = totalXp - xpForLevel(currentLevel - 1)
-  const xpNeeded = nextLevelXp(currentLevel) - xpForLevel(currentLevel - 1)
-  const progressPct = Math.min(100, Math.round((xpIntoLevel / xpNeeded) * 100))
+  const currentThreshold = xpThreshold(currentLevel)
+  const nextThreshold = nextLevelThreshold(currentLevel)
+  const xpIntoLevel = Math.max(0, totalXp - currentThreshold)
+  const xpNeeded = Math.max(1, nextThreshold - currentThreshold)
+  const progressPct = Math.min(100, Math.max(0, Math.round((xpIntoLevel / xpNeeded) * 100)))
 
   const initials = displayUser.fullName
     .split(' ')

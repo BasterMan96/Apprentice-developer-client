@@ -24,10 +24,17 @@ const SHOP_ITEMS: ShopItem[] = [
   { id: 5, name: 'Летний лагерь от Минцифры', price: 10000, emoji: '🏕️', category: 'opportunity' },
 ]
 
-function ShopCard({ item, userBytes }: { item: ShopItem; userBytes: number }) {
+function ShopCard({ item, userBytes, onBuy }: { item: ShopItem; userBytes: number; onBuy: (price: number) => void }) {
   const canAfford = userBytes >= item.price
   const [bought, setBought] = useState(false)
   const isOpportunity = item.category === 'opportunity'
+
+  const handleBuy = () => {
+    if (canAfford && !bought) {
+      setBought(true)
+      onBuy(item.price)
+    }
+  }
 
   return (
     <div className={`border rounded-2xl p-4 flex flex-col gap-2 shadow-sm transition-all hover:shadow-md ${
@@ -43,7 +50,7 @@ function ShopCard({ item, userBytes }: { item: ShopItem; userBytes: number }) {
         💎 {item.price.toLocaleString()} байтов
       </div>
       <button
-        onClick={() => { if (canAfford && !bought) setBought(true) }}
+        onClick={handleBuy}
         disabled={!canAfford || bought}
         className={`h-10 w-full rounded-xl text-sm font-bold flex items-center justify-center transition-colors ${
           bought
@@ -144,6 +151,7 @@ function AchievementBadge({ achievement }: { achievement: Achievement }) {
 export default function ProfilePage() {
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
+  const updateUser = useAuthStore((s) => s.updateUser)
   const navigate = useNavigate()
 
   const [stats, setStats] = useState<UserStats | null>(null)
@@ -162,6 +170,12 @@ export default function ProfilePage() {
       })
       .finally(() => setIsLoading(false))
   }, [])
+
+  const handleShopBuy = (price: number) => {
+    const newBalance = (stats?.bytesBalance ?? displayUser?.bytesBalance ?? 0) - price
+    if (stats) setStats({ ...stats, bytesBalance: newBalance })
+    updateUser({ bytesBalance: newBalance })
+  }
 
   const handleLogout = () => {
     logout()
@@ -313,7 +327,7 @@ export default function ProfilePage() {
         <h3 className="text-base font-bold text-gray-800 mt-2">Каталог товаров</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {SHOP_ITEMS.map((item) => (
-            <ShopCard key={item.id} item={item} userBytes={stats?.bytesBalance ?? displayUser.bytesBalance} />
+            <ShopCard key={item.id} item={item} userBytes={stats?.bytesBalance ?? displayUser.bytesBalance} onBuy={handleShopBuy} />
           ))}
         </div>
       </div>

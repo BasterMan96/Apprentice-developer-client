@@ -6,6 +6,54 @@ import { fetchProfile, fetchAchievements } from '../api/users'
 import { useAuthStore } from '../store/authStore'
 import type { UserStats, Achievement } from '../types'
 
+// ─── Shop Items ──────────────────────────────────────────────────────────────
+
+interface ShopItem {
+  id: number
+  name: string
+  price: number
+  emoji: string
+  description: string
+}
+
+const SHOP_ITEMS: ShopItem[] = [
+  { id: 1, name: 'Футболка Байтик', price: 500, emoji: '👕', description: 'Белая футболка с логотипом' },
+  { id: 2, name: 'Худи Байтик', price: 1000, emoji: '🧥', description: 'Тёплое худи для кодеров' },
+  { id: 3, name: 'Стикерпак', price: 100, emoji: '🎨', description: 'Набор из 10 стикеров' },
+  { id: 4, name: 'Кружка Python', price: 300, emoji: '☕', description: 'Кружка с змейкой' },
+  { id: 5, name: 'Блокнот', price: 200, emoji: '📓', description: 'Для заметок и алгоритмов' },
+  { id: 6, name: 'Рюкзак', price: 2000, emoji: '🎒', description: 'Рюкзак программиста' },
+]
+
+function ShopCard({ item, userBytes }: { item: ShopItem; userBytes: number }) {
+  const canAfford = userBytes >= item.price
+  const [bought, setBought] = useState(false)
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl p-3 flex flex-col gap-2 shadow-sm">
+      <div className="text-4xl text-center py-2">{item.emoji}</div>
+      <h3 className="font-bold text-sm text-gray-900 text-center leading-tight">{item.name}</h3>
+      <p className="text-xs text-gray-400 text-center">{item.description}</p>
+      <div className="flex items-center justify-center gap-1 text-sm font-bold text-primary-600">
+        💎 {item.price} байтов
+      </div>
+      <button
+        onClick={() => { if (canAfford && !bought) setBought(true) }}
+        disabled={!canAfford || bought}
+        className={`h-10 w-full rounded-xl text-sm font-bold flex items-center justify-center transition-colors ${
+          bought
+            ? 'bg-green-100 text-green-700'
+            : canAfford
+              ? 'bg-primary-500 hover:bg-primary-600 text-white'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+        }`}
+      >
+        {bought ? '✅ Заказано' : canAfford ? 'Обменять' : 'Не хватает'}
+      </button>
+    </div>
+  )
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 // Backend formula: level = floor(sqrt(xp / 100)) + 1
@@ -247,6 +295,23 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* Bytes Shop */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">🛒</span>
+          <h2 className="text-lg font-extrabold text-gray-900">Обменник Байтов</h2>
+        </div>
+        <p className="text-sm text-gray-500">Обменяй заработанные байты на крутой мерч!</p>
+        <div className="grid grid-cols-2 gap-3">
+          {SHOP_ITEMS.map((item) => (
+            <ShopCard key={item.id} item={item} userBytes={stats?.bytesBalance ?? displayUser.bytesBalance} />
+          ))}
+        </div>
+        <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 text-center">
+          <p className="text-sm font-semibold text-primary-700">🎯 Накопи 10 000 байтов — получи стажировку в IT-компании!</p>
+        </div>
+      </div>
 
       {/* Logout */}
       <button

@@ -5,12 +5,15 @@ import { motion } from 'framer-motion'
 import { registerApi } from '../api/auth'
 import { useAuthStore } from '../store/authStore'
 
+import type { UserRole } from '../types'
+
 interface FormState {
   fullName: string
   login: string
   phone: string
   password: string
   confirmPassword: string
+  role: UserRole
 }
 
 const initialForm: FormState = {
@@ -19,6 +22,7 @@ const initialForm: FormState = {
   phone: '',
   password: '',
   confirmPassword: '',
+  role: 'STUDENT',
 }
 
 export default function RegisterPage() {
@@ -60,6 +64,7 @@ export default function RegisterPage() {
         login: form.login.trim(),
         phone: form.phone.trim() || undefined,
         password: form.password,
+        role: form.role,
       })
       login(token, user)
       navigate('/', { replace: true })
@@ -92,6 +97,35 @@ export default function RegisterPage() {
           <h2 className="text-xl font-bold text-gray-800 mb-6">Создать аккаунт</h2>
 
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+            {/* Role selector */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-gray-700">Я регистрируюсь как</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setForm((p) => ({ ...p, role: 'STUDENT' }))}
+                  className={`h-12 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border-2 transition-all ${
+                    form.role === 'STUDENT'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  🎓 Ученик
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForm((p) => ({ ...p, role: 'PARENT' }))}
+                  className={`h-12 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border-2 transition-all ${
+                    form.role === 'PARENT'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  👨‍👩‍👧 Родитель
+                </button>
+              </div>
+            </div>
+
             {/* Full name */}
             <div className="flex flex-col gap-1.5">
               <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
